@@ -14,8 +14,14 @@ public class PlayerController : MonoBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         
+        if (data != null) 
+        {
+            currentHP = data.maxHP;
+            UpdateHpUI(); // Update tampilan HP saat start
+        }
     }
-     void Update()
+
+    void Update()
     {
         // 1. CEK STATE & NULL: Keamanan agar tidak error saat pindah scene
         if (GameManager.Instance == null || GameManager.Instance.currentState != GameState.Playing) 
@@ -28,5 +34,43 @@ public class PlayerController : MonoBehaviour
         transform.Translate(new Vector3(moveInput.x, moveInput.y, 0) * data.moveSpeed * Time.deltaTime);
     }
 
+    void OnCollisionStay2D(Collision2D collision)
+    {
+        // 3. DETEKSI DAMAGE (Tembok)
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            // Menggunakan Time.deltaTime agar damage stabil di semua PC (frame rate independent)
+            TakeDamage(15f * Time.deltaTime);
+        }
+    }
 
+    public void TakeDamage(float dmg)
+    {
+        currentHP -= dmg;
+        
+        // Pastikan HP tidak minus di UI
+        currentHP = Mathf.Max(0, currentHP);
+
+        // Update Console
+        Debug.Log("Player terkena damage! Sisa HP: " + currentHP.ToString("F0"));
+
+        // Update UI Text
+        UpdateHpUI();
+
+        // 4. CEK MATI
+        if (currentHP <= 0)
+        {
+            Debug.Log("<color=red>Player Mati!</color>");
+            GameManager.Instance.GameOver();
+        }
+    }
+
+    void UpdateHpUI()
+    {
+        if (hpText != null)
+        {
+            // "F0" artinya tidak menampilkan angka di belakang koma agar rapi
+            hpText.text = "HP: " + currentHP.ToString("F0");
+        }
+    }
 }

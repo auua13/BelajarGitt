@@ -26,19 +26,11 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         currentState = GameState.Playing;
-
-        if (pausePanel != null)
-            pausePanel.SetActive(false);
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(false);
     }
-
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Debug.Log("ESC PRESSED");
-
             if (currentState == GameState.Playing)
             {
                 PauseGame();
@@ -49,25 +41,12 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
-    public void PauseGame()
+ 
+public void BackToMenu()
     {
-        if (currentState != GameState.Playing) return;
-
-        currentState = GameState.Paused;
-        Time.timeScale = 0f;
-        if (pausePanel != null)
-            pausePanel.SetActive(true);
-    }
-
-    public void ResumeGame()
-    {
-        if (currentState != GameState.Paused) return;
-
-        currentState = GameState.Playing;
+        SceneManager.LoadScene("MainMenu");
+        ChangeState(GameState.MainMenu);
         Time.timeScale = 1f;
-        if (pausePanel != null)
-            pausePanel.SetActive(false);
     }
 
     public void ChangeState(GameState newState)
@@ -75,20 +54,36 @@ public class GameManager : MonoBehaviour
         currentState = newState;
     }
 
+    public void ResumeGame()
+    {
+        Time.timeScale = 1f;
+        pausePanel.SetActive(false);
+        currentState = GameState.Playing;
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene("Game");
+        Time.timeScale = 1f;
+        currentState = GameState.Playing;
+    }
+public void PauseGame()
+    {
+        Time.timeScale = 0f;
+        pausePanel.SetActive(true);
+        currentState = GameState.Paused;
+    }
+
     public void GameOver()
     {
-        currentState = GameState.GameOver;
         Time.timeScale = 0f;
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(true);
+        gameOverPanel.SetActive(true);
+        currentState = GameState.GameOver;
+        Debug.Log("Game Over");
     }
 
-    public void BackToMenu()
+    internal void SetState(GameState mainMenu)
     {
-        SceneManager.LoadScene("MainMenu");
-        ChangeState(GameState.MainMenu);
-        Time.timeScale = 1f;
+        throw new NotImplementedException();
     }
-
-
 }
