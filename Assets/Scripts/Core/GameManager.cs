@@ -13,9 +13,9 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        if(Instance == null)
+        if (Instance == null)
         {
-        Instance = this;
+            Instance = this;
         }
         else
         {
@@ -27,27 +27,68 @@ public class GameManager : MonoBehaviour
     {
         currentState = GameState.Playing;
 
-        pausePanel.SetActive(false);
-        gameOverPanel.SetActive(false);
+        if (pausePanel != null)
+            pausePanel.SetActive(false);
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Debug.Log("ESC PRESSED");
+
+            if (currentState == GameState.Playing)
+            {
+                PauseGame();
+            }
+            else if (currentState == GameState.Paused)
+            {
+                ResumeGame();
+            }
+        }
     }
 
     public void PauseGame()
     {
-        Time.timeScale = 0f;
-        pausePanel.SetActive(true);
+        if (currentState != GameState.Playing) return;
+
         currentState = GameState.Paused;
+        Time.timeScale = 0f;
+        if (pausePanel != null)
+            pausePanel.SetActive(true);
+    }
+
+    public void ResumeGame()
+    {
+        if (currentState != GameState.Paused) return;
+
+        currentState = GameState.Playing;
+        Time.timeScale = 1f;
+        if (pausePanel != null)
+            pausePanel.SetActive(false);
+    }
+
+    public void ChangeState(GameState newState)
+    {
+        currentState = newState;
     }
 
     public void GameOver()
     {
-        Time.timeScale = 0f;
-        gameOverPanel.SetActive(true);
         currentState = GameState.GameOver;
-        Debug.Log("Game Over");
+        Time.timeScale = 0f;
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
     }
 
-    internal void SetState(GameState mainMenu)
+    public void BackToMenu()
     {
-        throw new NotImplementedException();
+        SceneManager.LoadScene("MainMenu");
+        ChangeState(GameState.MainMenu);
+        Time.timeScale = 1f;
     }
+
+
 }

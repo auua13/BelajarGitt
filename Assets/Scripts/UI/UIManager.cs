@@ -7,5 +7,18 @@ public class UIManager : MonoBehaviour
     {
         SceneManager.LoadScene("Game");
     }
+
+    public void Resume()
+    {
+        GameManager.Instance.ResumeGame();
+    }
+
+    public void BackToMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu");
+        GameManager.Instance.ChangeState(GameState.MainMenu);
+    }
+
     
 }
